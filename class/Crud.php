@@ -15,14 +15,33 @@ class CrudProduto{
         $tipo = $postValue['tipo'];
         $qtda_produtos = $postValue['qtda_produto'];
         $descricao = $postValue['descricao'];
+        $preco = $postValue['preco'];
+
+
+        if(isset($_FILES['foto_produto'])){
+            $arquivo = $_FILES['foto_produto'];
+            $extensao = pathinfo($arquivo['name'], PATHINFO_EXTENSION);
+            $ex_permitidos = array('jpg', 'jpeg', 'png', 'gif');
+    
+            if (in_array(strtolower($extensao), $ex_permitidos)) {
+                $caminho_arquivo = 'foto_produtos/' . $arquivo['name'];
+                move_uploaded_file($arquivo['tmp_name'], $caminho_arquivo);
+            } else {
+                die('Você não pode fazer upload desse tipo de arquivo');
+            }
+        } else {
+            $caminho_arquivo = ''; // Se nenhum arquivo foi enviado, defina o caminho como vazio
+        }
         
 
-        $query = "INSERT INTO produtos (nome_produto, tipo, qtda_produto,descricao) VALUES (?,?,?,?)";
+        $query = "INSERT INTO produtos (nome_produto, tipo, qtda_produto,descricao,preco, foto_produto) VALUES (?,?,?,?,?,?)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1,$nome_produto);
         $stmt->bindParam(2,$tipo);
         $stmt->bindParam(3,$qtda_produtos);
         $stmt->bindParam(4,$descricao);
+        $stmt->bindParam(5,$preco);
+        $stmt->bindParam(6,$caminho_arquivo);
 
 
         $rows = $this->read();
@@ -44,57 +63,6 @@ class CrudProduto{
         return $stmt;
     }
 
-
-
-    public function update($postValues)
-    {
-        $id_produto = $postValues['id_produto'];
-        $nome_produto = $postValues['nome_produto'];
-        $tipo = $postValues['tipo'];
-        $qtda_produtos = $postValues['qtda_produto'];
-        $descricao = $postValues['descricao'];
-        
-
-
-        if (empty($id_produto) || empty($nome_produto) || empty($tipo) || empty($qtda_produtos) || empty($descricao)) {
-            return false;
-        }
-        
-
-        $query = "UPDATE produtos SET nome_produto = ?, tipo = ?, qtda_produto = ?, descricao = ? WHERE id_produto = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindValue(1, $nome_produto);
-        $stmt->bindValue(2, $tipo);
-        $stmt->bindValue(3, $qtda_produtos);
-        $stmt->bindValue(4, $descricao);
-        $stmt->bindValue(5, $id_produto);
-        if($stmt->execute()){
-            return true;
-        }else{
-            return false;
-        }
-    }
-
-
-    public function readOne($id_produto) {
-        $query = "SELECT * FROM produtos WHERE id_produto = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $id_produto);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-
-    public function delete($id_produto){
-        $query = "DELETE FROM produtos WHERE id_produto = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1,$id_produto);
-        if($stmt->execute()){
-            return true;
-        }else{
-            return false;
-        }
-    }
 }
 
 
