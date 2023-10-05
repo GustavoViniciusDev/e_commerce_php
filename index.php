@@ -3,6 +3,8 @@ session_start();
 
 require_once('class/Usuario.php');
 require_once('database/conexao.php');
+require_once('class/Carrinho.php');
+
 
 $database = new Conexao();
 $db = $database->getConnection();
@@ -20,6 +22,8 @@ if ($result->rowCount() > 0) {
     }
 }
 
+$id_produto = isset($_GET['id_produto'])?$_GET['id_produto']:"";
+
 ?>
 
 <!DOCTYPE html>
@@ -32,22 +36,25 @@ if ($result->rowCount() > 0) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/1a56e06420.js" crossorigin="anonymous"></script>
+    
 
     <style>
     
         .product-card {
             width: 100%;
-            max-width: 300px; /* Defina a largura máxima do card */
-            margin: 10px; /* Adiciona margem ao redor do card */
+            min-width: 300px; 
+            margin: 10px; 
             display: flex;
             flex-direction: column;
-            height: 100%; /* Define altura igual para todos os cards */
+            height: 100%; 
         }
 
         .product-card img {
             max-width: 100%;
             height: auto;
-            flex: 1; /* Permite que a imagem cresça e ocupe todo o espaço disponível verticalmente */
+            flex: 1;
         }
 
         .product-card .card-body {
@@ -64,6 +71,29 @@ if ($result->rowCount() > 0) {
             font-size: 14px;
             color: #666;
         }
+
+        .favorite-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .favorite-button {
+            width: 30px;
+            height: 30px;
+            font-size: 18px;
+            padding: 0;
+        }
+
+        .add-to-cart-button {
+            margin-top: 10px;
+            
+        }
+
+        .btn_visu{
+            margin-botom:20px;
+
+        }
     </style>
 </head>
 <body>
@@ -71,15 +101,19 @@ if ($result->rowCount() > 0) {
     
 <div class="container">
     <div class="row">
-        <?php
+    <?php
         foreach ($produtos as $produto) {
             echo '<div class="col-md-3 product-card">';
-            echo '<div class="card">';
+            echo '<div class="card position-relative">';
+            echo '<span class="favorite-icon"><a href="?id_produto=<?= $produto ?>"><button type="button" class="btn btn-outline-danger favorite-button"><i class="fas fa-heart"></i></button></a></span>';
             echo '<img src="' . $produto["foto_produto"] . '" alt="' . $produto["nome_produto"] . '" class="card-img-top">';
             echo '<div class="card-body">';
             echo '<h2 class="card-title">' . $produto["nome_produto"] . '</h2>';
             echo '<p class="card-text">' . $produto["descricao"] . '</p>';
-            echo '<a href="visualizar_produto.php?id_produto=' . $produto["id_produto"] . '" class="btn btn-primary">Visualizar Produto</a>';
+            echo '<form method="post" action="">'; // Formulário para adicionar ao carrinho
+            echo '<input type="hidden" name="produto_id" value="' . $produto["id_produto"] . '">';
+            echo '<a href="visualizar_produto.php?id_produto=' . $produto["id_produto"] . '" class="btn_visu btn btn-primary">Visualizar Produto</a>';
+            echo '</form>';
             echo '</div>';
             echo '</div>';
             echo '</div>';
@@ -88,8 +122,10 @@ if ($result->rowCount() > 0) {
     </div>
 </div>
 
-
-        
+<?php
+    $carrinho = new Carrinho($produtos[$id_produto]['nome_produto'], $produtos[$id_produto]['descricao'], $produtos[$id_produto]['preco'], $produtos[$id_produto]['foto_produto'], $id_produto); 
+    $carrinho->getCarrinho();
+?>
 
 </body>
 </html>

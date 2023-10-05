@@ -21,7 +21,7 @@ class CrudProduto{
         if(isset($_FILES['foto_produto'])){
             $arquivo = $_FILES['foto_produto'];
             $extensao = pathinfo($arquivo['name'], PATHINFO_EXTENSION);
-            $ex_permitidos = array('jpg', 'jpeg', 'png', 'gif');
+            $ex_permitidos = array('jpg', 'jpeg', 'png', 'gif', 'webp');
     
             if (in_array(strtolower($extensao), $ex_permitidos)) {
                 $caminho_arquivo = 'foto_produtos/' . $arquivo['name'];
