@@ -1,4 +1,5 @@
 <?php
+// include('database/conexao.php');
 
     class Carrinho{
         public $id_produto;
@@ -16,25 +17,20 @@
         }
 
 
-        public function getCarrinho(){
-            $_SESSION['carrinho'][$this->id_produto] = [
+        public function getCarrinho()
+        {
+             $_SESSION['carrinho'][$this->id_produto] = [
                 'id_produto' => "{$this->id_produto}",
                 'nome_produto' => "{$this->nome_produto}",
                 'descricao' => "{$this->descricao}",
                 'preco' => "{$this->preco}",
-                'foto_produto' => "{$this->foto_produto}",
-                'quant' => '1'
+                'foto_produto' => "{$this->foto_produto}"
             ];
 
-            foreach($_SESSION['carrinho'] as $produto){
-                echo "<p> Id do produto: ". $produto['id_produto'] . " | 
-                            Nome do Produto: ". $produto['nome_produto'] . " | 
-                            Descrição: ". $produto['descricao'] . " |
-                            Preço: ". $produto['preco'] . "| 
-                            Foto do Produto: " . $produto['foto_produto'] . " | 
-                            Quantidade: " . $produto['quant'] . 
-                            "</p><br>";
-            }
+            // print_r($_SESSION);
+
+           
+            
         }
 
     

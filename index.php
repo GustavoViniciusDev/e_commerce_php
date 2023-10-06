@@ -5,11 +5,9 @@ require_once('class/Usuario.php');
 require_once('database/conexao.php');
 require_once('class/Carrinho.php');
 
-
 $database = new Conexao();
 $db = $database->getConnection();
 $classUsuario = new Usuario($db);
-
 
 $produtos = [];
 
@@ -22,9 +20,11 @@ if ($result->rowCount() > 0) {
     }
 }
 
-$id_produto = isset($_GET['id_produto'])?$_GET['id_produto']:"";
+$id_produto = isset($_GET['id_produto']) ? $_GET['id_produto'] : "";
+
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pt_BR">
@@ -38,6 +38,7 @@ $id_produto = isset($_GET['id_produto'])?$_GET['id_produto']:"";
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://kit.fontawesome.com/1a56e06420.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
 
     <style>
@@ -101,31 +102,66 @@ $id_produto = isset($_GET['id_produto'])?$_GET['id_produto']:"";
     
 <div class="container">
     <div class="row">
-    <?php
-        foreach ($produtos as $produto) {
-            echo '<div class="col-md-3 product-card">';
-            echo '<div class="card position-relative">';
-            echo '<span class="favorite-icon"><a href="?id_produto=<?= $produto ?>"><button type="button" class="btn btn-outline-danger favorite-button"><i class="fas fa-heart"></i></button></a></span>';
-            echo '<img src="' . $produto["foto_produto"] . '" alt="' . $produto["nome_produto"] . '" class="card-img-top">';
-            echo '<div class="card-body">';
-            echo '<h2 class="card-title">' . $produto["nome_produto"] . '</h2>';
-            echo '<p class="card-text">' . $produto["descricao"] . '</p>';
-            echo '<form method="post" action="">'; // Formulário para adicionar ao carrinho
-            echo '<input type="hidden" name="produto_id" value="' . $produto["id_produto"] . '">';
-            echo '<a href="visualizar_produto.php?id_produto=' . $produto["id_produto"] . '" class="btn_visu btn btn-primary">Visualizar Produto</a>';
-            echo '</form>';
-            echo '</div>';
-            echo '</div>';
-            echo '</div>';
-        }
-        ?>
+        <?php foreach ($produtos as $produto => $value) : ?>
+            <div class="col-md-3 product-card">
+                <div class="card position-relative">
+                    <span class="favorite-icon"><a href="?id_produto=<?= $produto ?>"><button type="button" class="btn btn-outline-danger favorite-button"><i class="fas fa-heart"></i></button></a></span>
+                    <img src="<?= $value["foto_produto"] ?>" alt="<?= $value["nome_produto"] ?>" class="card-img-top">
+                    <div class="card-body">
+                        <h2 class="card-title"><?= $value["nome_produto"] ?></h2>
+                        <p class="card-text"><?= $value["descricao"] ?></p>
+                        <p class="produto-preco">Preço: R$ <?php echo number_format($value['preco'], 2, ',', '.'); ?></p>
+                        <input type="hidden" name="produto_id" value="<?= $value["id_produto"] ?>">
+                        <a href="visualizar_produto.php?id_produto=<?= $value["id_produto"] ?>" class="btn_visu btn btn-primary">Visualizar Produto</a>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
     </div>
 </div>
 
 <?php
-    $carrinho = new Carrinho($produtos[$id_produto]['nome_produto'], $produtos[$id_produto]['descricao'], $produtos[$id_produto]['preco'], $produtos[$id_produto]['foto_produto'], $id_produto); 
+    $carrinho = new Carrinho( $id_produto,$produtos[$id_produto]['nome_produto'], $produtos[$id_produto]['descricao'], $produtos[$id_produto]['preco'], $produtos[$id_produto]['foto_produto']); 
     $carrinho->getCarrinho();
+    
+     foreach($_SESSION['carrinho'] as $produto => $value){
+                echo "<p> Id do produto: ". $value['id_produto'] . " | 
+                            Nome do Produto: ". $value['nome_produto'] . " | 
+                            Descrição: ". $value['descricao'] . " |
+                            Preço: ". $value['preco'] . "| 
+                            Foto do Produto: " . $value['foto_produto'] . 
+                            "</p><br>";
+                echo "<a href='javascript:void(0);' class='excluir-produto' data-id='{$produto}'>Excluir</a>";
+               
+            }
 ?>
+
+
+
+
+<script>
+    $(document).ready(function () {
+        $(".excluir-produto").click(function () {
+            var idProduto = $(this).data("id");
+
+            $.ajax({
+                url: "excluir_produto.php", // Onde "excluir_produto.php" é o script PHP para processar a exclusão
+                type: "POST",
+                data: { id_produto: idProduto },
+                success: function (response) {
+                    // Atualize a exibição do carrinho após a exclusão bem-sucedida
+                    // Você pode recarregar a página ou atualizar a lista de produtos do carrinho via AJAX
+                    location.reload(); // Recarrega a página (isso é apenas um exemplo)
+                },
+                error: function (xhr, status, error) {
+                    // Lida com erros de solicitação AJAX, se necessário
+                    console.error(error);
+                },
+            });
+        });
+    });
+</script>
+
 
 </body>
 </html>
