@@ -124,16 +124,16 @@ $id_produto = isset($_GET['id_produto']) ? $_GET['id_produto'] : "";
     $carrinho = new Carrinho( $id_produto,$produtos[$id_produto]['nome_produto'], $produtos[$id_produto]['descricao'], $produtos[$id_produto]['preco'], $produtos[$id_produto]['foto_produto']); 
     $carrinho->getCarrinho();
     
-     foreach($_SESSION['carrinho'] as $produto => $value){
-                echo "<p> Id do produto: ". $value['id_produto'] . " | 
-                            Nome do Produto: ". $value['nome_produto'] . " | 
-                            Descrição: ". $value['descricao'] . " |
-                            Preço: ". $value['preco'] . "| 
-                            Foto do Produto: " . $value['foto_produto'] . 
-                            "</p><br>";
-                echo "<a href='javascript:void(0);' class='excluir-produto' data-id='{$produto}'>Excluir</a>";
+    //  foreach($_SESSION['carrinho'] as $produto => $value){
+    //             echo "<p> Id do produto: ". $value['id_produto'] . " | 
+    //                         Nome do Produto: ". $value['nome_produto'] . " | 
+    //                         Descrição: ". $value['descricao'] . " |
+    //                         Preço: ". $value['preco'] . "| 
+    //                         Foto do Produto: " . $value['foto_produto'] . 
+    //                         "</p><br>";
+    //             echo "<a href='javascript:void(0);' class='excluir-produto' data-id='{$produto}'>Excluir</a>";
                
-            }
+    //         }
 ?>
 
 
